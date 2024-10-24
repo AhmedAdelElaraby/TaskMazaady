@@ -25,9 +25,11 @@ class Table : AppCompatActivity() {
         var Main = intent.getStringExtra("Main")
         var Sub= intent.getStringExtra("Sub")
         var processtype=intent.getStringExtra("processtype")
+        var valuoEditRecycler =intent.getStringExtra("valuoEditRecycler")
         selectedItems?.add(Main)
         selectedItems?.add(Sub)
         selectedItems?.add(processtype)
+        selectedItems?.add(valuoEditRecycler)
 
        val adapters = AdapterTabel()
         binding.recTabel.apply {
@@ -37,6 +39,8 @@ class Table : AppCompatActivity() {
 
 
         adapters.differ.submitList(selectedItems)
+
+
         binding.bunDane.setOnClickListener {
             val intent = Intent(this@Table, SecondScreen::class.java)
             startActivity(intent)
