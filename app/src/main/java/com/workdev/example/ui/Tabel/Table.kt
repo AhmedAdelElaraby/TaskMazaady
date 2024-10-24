@@ -1,5 +1,6 @@
 package com.workdev.example.ui.Tabel
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -10,6 +11,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.workdev.example.R
 import com.workdev.example.databinding.ActivityTableBinding
+import com.workdev.example.ui.Host.SecondScreen
 import com.workdev.example.ui.Tabel.utils.AdapterTabel
 
 class Table : AppCompatActivity() {
@@ -21,7 +23,7 @@ class Table : AppCompatActivity() {
         val  intent = intent
        val  selectedItems = intent.getStringArrayListExtra("tabel")
         var Main = intent.getStringExtra("Main")
-       var Sub= intent.getStringExtra("Sub")
+        var Sub= intent.getStringExtra("Sub")
         var processtype=intent.getStringExtra("processtype")
         selectedItems?.add(Main)
         selectedItems?.add(Sub)
@@ -35,6 +37,12 @@ class Table : AppCompatActivity() {
 
 
         adapters.differ.submitList(selectedItems)
+        binding.bunDane.setOnClickListener {
+            val intent = Intent(this@Table, SecondScreen::class.java)
+            startActivity(intent)
+}
+
+
 
     }
 }
