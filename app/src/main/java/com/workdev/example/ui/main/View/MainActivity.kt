@@ -1,11 +1,13 @@
 package com.workdev.example.ui.main.View
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
@@ -24,6 +26,7 @@ import com.workdev.domain.entity.AllCats.Children
 import com.workdev.domain.entity.Brand.Option
 import com.workdev.example.R
 import com.workdev.example.databinding.ActivityMainBinding
+import com.workdev.example.databinding.ItemMainProcessTypeBinding
 import com.workdev.example.ui.Tabel.Table
 import com.workdev.example.ui.main.ViewModel.ViewModel
 import com.workdev.example.ui.main.utils.AdapterProcess
@@ -42,7 +45,7 @@ class MainActivity : AppCompatActivity() ,OnClickType,OnClick {
     val Children = ArrayList<Children>()
 
 
-    lateinit var myDialog : Dialog
+
     private val viewModel: ViewModel by viewModels()
     val arrayBrand = ArrayList<Option>()
     var SubCats:String =""
@@ -51,6 +54,7 @@ class MainActivity : AppCompatActivity() ,OnClickType,OnClick {
     var valuoEditRecycler:String = ""
     var arrayType=  ArrayList<String>()
     var  adaptersType=AdapterProcessType(this,arrayType)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -95,37 +99,11 @@ class MainActivity : AppCompatActivity() ,OnClickType,OnClick {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//        binding.autoCompleteSubCategory.setAdapter(ArrayAdapter)
-        //  binding.autoCompleteProcessType.setAdapter(ArrayAdapter)
-
         binding.autoCompleteProcess.setOnClickListener {
 
             SuccassSendDeleted()
 
         }
-
-
-
-
 
         viewModel.getAllCatsLiveData.observe(this) {
             when (it) {
@@ -163,9 +141,6 @@ class MainActivity : AppCompatActivity() ,OnClickType,OnClick {
 
         }
 
-
-
-
         viewModel.getSubCatsLiveData.observe(this) {it->
             it.forEach {
                 Children.add(it)
@@ -176,8 +151,6 @@ class MainActivity : AppCompatActivity() ,OnClickType,OnClick {
 
 
         }
-
-
 
         viewModel.SubCatsLiveData.observe(this@MainActivity) {
             when (it) {
@@ -262,13 +235,13 @@ class MainActivity : AppCompatActivity() ,OnClickType,OnClick {
 
 
     fun SuccassSendDeleted() {
-        myDialog = Dialog(this@MainActivity)
-        myDialog.setContentView(R.layout.item_main_process_type)
-        val rec=myDialog.findViewById<RecyclerView>(R.id.reccode)
-        val search =myDialog.findViewById<SearchView>(R.id.editTextSearch)
-        rec.layoutManager=LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false)
-        rec.adapter = adaptersType
-        search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+        val dialogBinding: ItemMainProcessTypeBinding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.item_main_process_type, null, false)
+        val dialog = AlertDialog.Builder(this).setView(dialogBinding.root)
+
+        dialogBinding.reccode.layoutManager=LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false)
+        dialogBinding.reccode.adapter = adaptersType
+       dialogBinding.editTextSearch.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 // Not used
                 return false
@@ -284,16 +257,13 @@ class MainActivity : AppCompatActivity() ,OnClickType,OnClick {
             }
         })
 
+            val d= dialog.create().window
+                d!!.setGravity(Gravity.BOTTOM)
+                 d.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                    dialog.show()
 
-        val window = myDialog.window
-        window!!.setLayout(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        window.setGravity(Gravity.BOTTOM)
-        myDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        myDialog.create()
-        myDialog.show()
+
+
 
     }
 
@@ -303,14 +273,14 @@ class MainActivity : AppCompatActivity() ,OnClickType,OnClick {
            valuoEditRecycler= binding.textInputEditText.text.toString()
            binding.Spaclfy.visibility=View.VISIBLE
            binding.label.setHint(name)
-           myDialog.dismiss()
+
 
        }
         else{
            ProcessType=name
            binding.Spaclfy.visibility=View.GONE
            binding.label.setHint(name)
-           myDialog.dismiss()
+
 
        }
     }
