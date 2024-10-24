@@ -1,23 +1,21 @@
 package com.workdev.example.ui.main.utils
 
 
-import android.content.Context
+import android.annotation.SuppressLint
+import android.os.Build
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.workdev.domain.entity.SubCats.Data
-import com.workdev.example.R
-import com.workdev.example.databinding.ItemCatSecondScreenBinding
-import com.workdev.example.databinding.ItemProcessBinding
 import com.workdev.example.databinding.ItemProcessTypeBinding
+import java.util.Locale
 
 
-class AdapterProcessType(private val onClickType: OnClickType): RecyclerView.Adapter<AdapterProcessType.ViewHolder>() {
+class AdapterProcessType(private val onClickType: OnClickType,private var items:List<String>): RecyclerView.Adapter<AdapterProcessType.ViewHolder>() {
     lateinit var  binding:ItemProcessTypeBinding
+    private var filteredItems: List<String> = items
 
 
 
@@ -30,10 +28,12 @@ class AdapterProcessType(private val onClickType: OnClickType): RecyclerView.Ada
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.binding.textType.setText(differ.currentList[position])
+        holder.binding.textType.setText(filteredItems[position])
         holder.setIsRecyclable(false)
+
+
         holder.itemView.setOnClickListener {
-            onClickType.OnClickType(differ.currentList[position])
+            onClickType.OnClickType(filteredItems[position])
         }
 
 
@@ -45,26 +45,28 @@ class AdapterProcessType(private val onClickType: OnClickType): RecyclerView.Ada
     }
 
     override fun getItemCount(): Int {
-        return differ.currentList.size
+        return filteredItems.size
     }
+
+
+
+
+    fun filter(query: String) {
+        filteredItems = if (query.isEmpty()) {
+            items
+
+        } else {
+            items.filter { it.contains(query, ignoreCase = true) }
+        }
+        notifyDataSetChanged()
+    }
+
 
     inner class ViewHolder(var binding: ItemProcessTypeBinding) : RecyclerView.ViewHolder(binding.root)
 
 
-    private val differCallback = object : DiffUtil.ItemCallback<String>(){
-        override fun areItemsTheSame(oldItem:String , newItem:String ): Boolean {
-            return  oldItem == newItem
-        }
 
 
-        override fun areContentsTheSame(oldItem:String , newItem:String ): Boolean {
-
-            return oldItem == newItem
-
-        }
-
-    }
-   val differ = AsyncListDiffer(this,differCallback)
 
 
 

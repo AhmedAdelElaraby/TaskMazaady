@@ -1,6 +1,5 @@
 package com.workdev.example.ui.main.View
 
-import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
@@ -9,7 +8,6 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.ArrayAdapter
-import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.SearchView
 import android.widget.Toast
@@ -25,7 +23,6 @@ import com.workdev.domain.entity.AllCats.Category
 import com.workdev.domain.entity.AllCats.Children
 import com.workdev.domain.entity.Brand.Option
 import com.workdev.example.R
-
 import com.workdev.example.databinding.ActivityMainBinding
 import com.workdev.example.ui.Tabel.Table
 import com.workdev.example.ui.main.ViewModel.ViewModel
@@ -35,6 +32,7 @@ import com.workdev.example.ui.main.utils.OnClick
 import com.workdev.example.ui.main.utils.OnClickType
 import com.workdev.example.utils.Const
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 
 
 @AndroidEntryPoint
@@ -43,7 +41,7 @@ class MainActivity : AppCompatActivity() ,OnClickType,OnClick {
     val array = ArrayList<Category>()
     val Children = ArrayList<Children>()
 
-    val adaptersType= AdapterProcessType(this)
+
     lateinit var myDialog : Dialog
     private val viewModel: ViewModel by viewModels()
     val arrayBrand = ArrayList<Option>()
@@ -51,6 +49,8 @@ class MainActivity : AppCompatActivity() ,OnClickType,OnClick {
     var MainCats:String = ""
     var ProcessType:String= ""
     var valuoEditRecycler:String = ""
+    var arrayType=  ArrayList<String>()
+    var  adaptersType=AdapterProcessType(this,arrayType)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -191,8 +191,12 @@ class MainActivity : AppCompatActivity() ,OnClickType,OnClick {
                 }
 
                 is ApiStateSubCats.Success -> {
+                    arrayType.clear()
+                    val data=it.data.data.get(0).options.map { it.name}
+                    data.forEach{
+                        arrayType.add(it)
+                    }
 
-                    adaptersType.differ.submitList(it.data.data[0].options.map {it.name})
 
                     adapters.differ.submitList(it.data.data.subList(1,it.data.data.size))
 
@@ -264,7 +268,21 @@ class MainActivity : AppCompatActivity() ,OnClickType,OnClick {
         val search =myDialog.findViewById<SearchView>(R.id.editTextSearch)
         rec.layoutManager=LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false)
         rec.adapter = adaptersType
+        search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                // Not used
+                return false
+            }
 
+            override fun onQueryTextChange(newText: String): Boolean {
+
+
+                adaptersType.filter(newText  ?: "")
+
+
+                return false
+            }
+        })
 
 
         val window = myDialog.window
@@ -300,6 +318,7 @@ class MainActivity : AppCompatActivity() ,OnClickType,OnClick {
     override fun OnClick(id: Int) {
         viewModel.Brand(Const.PrivateKey,id)
     }
+
 
 
 }
